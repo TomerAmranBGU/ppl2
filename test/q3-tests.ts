@@ -1,9 +1,11 @@
 import { expect } from 'chai';
-import { parseL21, parseL21Exp, Exp, Program } from './L21-ast';
-import { L21ToL2 } from './q3';
+import { parseL21, parseL21Exp, Exp, Program, makeForExp } from './L21-ast';
+import { L21ToL2} from './q3';
 import { unparseL21 } from './L21-unparse';
 import { Result, bind, isFailure, makeOk } from '../imp/result';
 import { parse as p } from "../imp/parser";
+import { makeVarDecl, makeNumExp, makeBoolExp } from '../imp/L2-ast';
+const util = require('util')
 
 const L21toL2Result = (x: string): Result<Exp | Program> =>
     bind(bind(p(x), parseL21Exp), L21ToL2);
@@ -28,5 +30,10 @@ describe('Q3 Tests', () => {
     it('test 2', () => {
         expect(bind(bind(parseL21(`(L21 ((lambda (x) (* x x)) (+ 5 4)) (if (> y 6) 8 (for i 1 3 (* i i))))`), L21ToL2), unparseL21)).to.deep.equal(makeOk(`(L21 ((lambda (x) (* x x)) (+ 5 4)) (if (> y 6) 8 ((lambda () ((lambda (i) (* i i)) 1) ((lambda (i) (* i i)) 2) ((lambda (i) (* i i)) 3)) )))`));
     });
+    it('start > end soppused to fail', ()=>{
+        expect(L21toL2Result(`(for i 3 2 (* i i))`)).to.satisfy(isFailure);
+    })
 });
+
+
 

@@ -189,10 +189,7 @@ const parseGoodFor = (varible: Sexp, from: Sexp, to: Sexp, body: Sexp): Result<F
         const toCExp = y.value;
         if (!isNumExp(fromCExp)) return makeFailure("Second arg of FOR must be a number"); 
         if (!isNumExp(toCExp)) return makeFailure("Third arg of FOR must be a number");
-
         return bind(parseL21CExp(body), (body: CExp)=> makeOk(makeForExp(makeVarDecl(varible), fromCExp, toCExp, body)));
-
-
     }
 // const parseGoodFor = (varible: Sexp, from: Sexp, to: Sexp, body: Sexp): Result<ForExp>=>
 // ! isIdentifier(varible) ? makeFailure("First arg of define must be an identifier") :

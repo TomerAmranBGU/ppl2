@@ -1,5 +1,5 @@
 import {isDefineExp, makeDefineExp, isCExp, makeBoolExp, makeIfExp,ForExp, AppExp, Exp, Program, ProcExp, CExp ,makeAppExp, makeProcExp, makeNumExp, isProgram, makeProgram, isForExp, isExp, isProcExp, makeForExp, isIfExp, isAppExp, isVarDecl, isVarRef, isPrimOp, isBoolExp, isNumExp} from "./L21-ast";
-import { Result, makeOk } from "../imp/result";
+import { Result, makeOk, makeFailure,bind, mapResult, safe3, safe2 } from "../imp/result";
 
 
 
@@ -23,30 +23,32 @@ Purpose: @TODO
 Signature: @TODO
 Type: @TODO
 */
-export const L21ToL2 = (exp: Exp | Program): Result<Exp | Program> =>
-    makeOk(
-        isProgram(exp)? makeProgram(exp.exps.map(ExpConvertion)) :
-        ExpConvertion(exp)
-        )
 
-const ExpConvertion = (exp: Exp): Exp => 
-        isDefineExp(exp)? exp:
-        isCExp(exp)? cExpConv(exp):
-        makeBoolExp(true);//junk
- 
-    
+export const L21ToL2 = (exp: Exp | Program): Result<Exp |Program> => 
+    isProgram(exp)? 
+        bind(mapResult(ExpConverstion,exp.exps), (exps: Exp[])=> makeOk(makeProgram(exps))):
+        ExpConverstion(exp) 
 
-const cExpConv = (exp: CExp): CExp =>
-    isForExp(exp)? for2app(makeForExp(exp.var,exp.start,exp.end,cExpConv(exp.body))):
-    isProcExp(exp)? makeProcExp(exp.args, exp.body.map(cExpConv)):
-    isIfExp(exp)? makeIfExp(cExpConv(exp.test),cExpConv(exp.then),cExpConv(exp.alt)):
-    isAppExp(exp)? makeAppExp(cExpConv(exp.rator), exp.rands.map(cExpConv)):
-    exp
-    // isVarDecl(exp) ? exp:
-    // isVarRef(exp) ? exp:
-    // isPrimOp(exp) ? exp:
-    // isBoolExp(exp)? exp:
-    // isNumExp(exp) ? exp:
-    
+const ExpConverstion = (exp:Exp): Result<Exp> => 
+    isDefineExp(exp)? 
+        bind(cExpConv(exp.val), (val:CExp)=> makeOk(makeDefineExp(exp.var, val))):
+        cExpConv(exp)
+
+const cExpConv = (exp:CExp): Result<CExp> => 
+    isForExp(exp)? 
+        (exp.start.val > exp.end.val)? makeFailure(`ForExp Failure: Start can't be greater than End`): 
+        bind(cExpConv(exp.body), (body: CExp) => 
+            makeOk(for2app(makeForExp(exp.var,exp.start,exp.end, body)))):
+    isProcExp(exp)? 
+        bind(mapResult(cExpConv,exp.body), (body: CExp[])=> 
+            makeOk(makeProcExp(exp.args,body))):
+    isIfExp(exp)? 
+        safe3((test:CExp,then:CExp,alt:CExp)=> 
+            makeOk(makeIfExp(test,then,alt)))(cExpConv(exp.test),cExpConv(exp.then),cExpConv(exp.alt)):
+    isAppExp(exp)? 
+        safe2((rator:CExp,rands:CExp[])=> 
+            makeOk(makeAppExp(rator,rands)))(cExpConv(exp.rator),mapResult(cExpConv, exp.rands)):
+    makeOk(exp)
+
     
 
