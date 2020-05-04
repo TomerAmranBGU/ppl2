@@ -3,9 +3,10 @@ import { map } from "ramda";
 import { Result, makeOk, makeFailure, mapResult, bind, safe3, safe2 } from "../imp/result";
 
 /*
-Purpose: @TODO
-Signature: @TODO
-Type: @TODO
+Purpose: given aprogram in L2, if the Program|Exp is correct in L2 l2ToJS will return OK with it's value field to be a javascript program that is equvalent to the input program
+            in case that the input program is incorrect a Failur will be returned
+Signature: (exp)-> res
+Type: @TODO [(Exp | Program) =>Result<string>]
 */
 export const l2ToJS = (exp: Exp | Program): Result<string> => 
 isProgram(exp) ? programParser(exp) :

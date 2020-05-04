@@ -4,9 +4,9 @@ import { Result, makeOk, makeFailure,bind, mapResult, safe3, safe2 } from "../im
 
 
 /*
-Purpose: @TODO
-Signature: @TODO
-Type: @TODO
+Purpose: convert For exprestion to Application exprestion. The return appExp should be equvalente to the given for.
+Signature: for2app(exp) => app
+Type: [ForExp->AppExp]
 */
 export const for2app = (exp: ForExp): AppExp => 
     {
@@ -19,9 +19,11 @@ export const for2app = (exp: ForExp): AppExp =>
     }
 
 /*
-Purpose: @TODO
-Signature: @TODO
-Type: @TODO
+Purpose: given L21 Program or Exprestion L21TOL2 translate it to equvalent Program or Exprestion in L2
+            the returned value is in encapulated in Resulte, in case of corecte Exp/Program in L21 return value will ne an OK<Exp|Program>
+            in case of incorrect program in L21 the returend value will be Failure
+Signature: (exp)=> Res
+Type: [ (Exp | Program) ->  Result<Exp |Program>]
 */
 
 export const L21ToL2 = (exp: Exp | Program): Result<Exp |Program> => 
